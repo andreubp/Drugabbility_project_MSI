@@ -1,19 +1,9 @@
 
 # coding: utf-8
 
-# In[4]:
-
 from htmd import *
 os.chdir('./') # Don't use this command
 
-
-# # Using docking to generate starting poses for simulations
-# 
-# Download the files for this tutorial from this [link](http://pub.htmd.org/nc983hu3brda/bentryp.tar.gz)
-
-# ## Dock the protein with the ligand
-
-# In[5]:
 
 prot = Molecule('bentryp/trypsin.pdb')
 prot.center()
@@ -23,7 +13,6 @@ poses, scores = dock(prot, lig)
 
 # ### Visualize the docked poses
 
-# In[6]:
 print('Now it will fail')
 mol = Molecule()
 mol.append(prot)
@@ -35,7 +24,6 @@ mol.view(sel='resname MOL', style='Licorice', color=1)
 
 # ## Build systems from docked poses
 
-# In[7]:
 
 molbuilt = []
 for i, p in enumerate(poses):
@@ -76,17 +64,17 @@ len(molbuilt)
 from ipywidgets.widgets import Box
 w = []
 for i, m in enumerate(molbuilt):
-    #m.view(sel='protein', style='NewCartoon', hold=True)
-    #m.view(sel='water', style='Lines', hold=True)
+    m.view(sel='protein', style='NewCartoon', hold=True)
+    m.view(sel='water', style='Lines', hold=True)
     h = m.view(sel='resname MOL', style='Licorice', color=0)
     w.append(h)
+print('w')
+print(w,w[0],w[1])
 b = Box(children=(w[0],w[1]))
 b
 
 
 # ## Equilibrate the build systems
-
-# In[21]:
 
 from htmd.protocols.equilibration_v1 import Equilibration
 from natsort import natsorted
@@ -119,7 +107,7 @@ md = Production()
 md.acemd.run = '50ns'
 md.temperature = 298
 
-equils = natsort(glob('docked/equil/*/'))
+equils = natsorted(glob('docked/equil/*/'))
 for i, b in enumerate(equils):
     md.write(b, 'docked/generators/{}/'.format(i+1))
 
@@ -134,3 +122,30 @@ mdx.submit(glob('./docked/generators/*/'))
 
 mdx.wait()
 
+from htmd import *
+from htmd.protocols.production_v1 import Production
+from natsort import natsorted
+
+adapt = Production()
+adapt.acemd.show()
+
+#adapt.acemd.bincoordinates = '/docked/equil/1/output.coor'
+#adapt.acemd.extendedsystem  = '/docked/equil/1/output.xsc'
+adapt.acemd.run='50ns'
+adapt.temperature = 300
+
+
+equils = natsorted(glob('docked/equil/*/'))
+print(len(equils))
+#for i, b in enumerate(equils):
+#    adapt.write('/docked/generators/{}'.format(i+1))
+
+#adapt = AdaptiveRun()
+#adapt.nmin = 2
+#adapt.nmax = 3
+#adapt.nepochs = 2
+#adapt.ticadim = 0
+#adapt.metricsel1 = 'name CA'
+#adapt.generatorspath = htmd.home()+'/data/dhfr'
+#adapt.app = AcemdLocal()
+#adapt.run()
