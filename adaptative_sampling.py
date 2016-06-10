@@ -9,11 +9,12 @@ adapt.acemd.show()
 #adapt.acemd.extendedsystem  = '/docked/equil/1/output.xsc'
 adapt.acemd.run='50ns'
 adapt.temperature = 300
-print ('antes')
-equils= natsorted(glob('/docked/equil/*/'))
-for i, b in enumerate(equils):
-    print ('here')
-    adapt.write('/docked/generators/{}'.format(i+1))
+
+
+equils = natsorted(glob('docked/equil/*/'))
+print(len(equils))
+#for i, b in enumerate(equils):
+#    adapt.write('/docked/generators/{}'.format(i+1))
 
 #adapt = AdaptiveRun()
 #adapt.nmin = 2
