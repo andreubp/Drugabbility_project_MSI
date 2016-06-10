@@ -1,3 +1,4 @@
+from htmd import *
 from htmd.protocols.production_v1 import Production
 from natsort import natsorted
 adapt = Production()
@@ -8,9 +9,10 @@ adapt.acemd.show()
 adapt.acemd.run='50ns'
 adapt.temperature = 300
 
-equils= sort(glob('/docked/equil/*/'))
-for i, b in enumerate(equils):
-    adapt.write('/docked/generators/{}'.format(i+1))
+equils = natsorted(glob('docked/equil/*/'))
+print(len(equils))
+#for i, b in enumerate(equils):
+#    adapt.write('/docked/generators/{}'.format(i+1))
 
 #adapt = AdaptiveRun()
 #adapt.nmin = 2
