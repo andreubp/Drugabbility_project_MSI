@@ -1,0 +1,20 @@
+HEADER    NONAME 05-Jun-11
+TITLE     Produced by PDBeChem
+COMPND    ACT      
+AUTHOR    EBI-PDBe Generated
+REVDAT   1  05-Jun-11     0
+ATOM      1  C   ACT     0      -0.072   0.000   0.000  1.00 20.00           C+0
+ATOM      2  O   ACT     0      -0.682   1.056   0.000  1.00 20.00           O+0
+ATOM      3  OXT ACT     0      -0.682  -1.056   0.000  1.00 20.00           O-1
+ATOM      4  CH3 ACT     0       1.435   0.000   0.000  1.00 20.00           C+0
+ATOM      5  H1  ACT     0       1.799   0.000   1.028  1.00 20.00           H+0
+ATOM      6  H2  ACT     0       1.799  -0.890  -0.514  1.00 20.00           H+0
+ATOM      7  H3  ACT     0       1.799   0.890  -0.514  1.00 20.00           H+0
+CONECT    1    4    2    3
+CONECT    2    1
+CONECT    3    1
+CONECT    4    1    5    6    7
+CONECT    5    4
+CONECT    6    4
+CONECT    7    4
+END
