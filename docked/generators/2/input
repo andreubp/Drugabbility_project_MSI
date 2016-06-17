@@ -1,0 +1,27 @@
+#
+coordinates                    	structure.pdb
+cutoff                         	9
+energyfreq                     	5000
+exclude                        	scaled1-4
+extendedsystem                 	input.xsc
+fullelectfrequency             	2
+hydrogenscale                  	4
+langevin                       	on
+langevindamping                	0.1
+langevintemp                   	300
+outputname                     	output
+parameters                     	parameters
+pme                            	on
+pmegridspacing                 	1.0
+restart                        	on
+restartfreq                    	5000
+rigidbonds                     	all
+1-4scaling                     	1.0
+structure                      	structure.psf
+switchdist                     	7.5
+switching                      	on
+temperature                    	300
+timestep                       	4
+xtcfile                        	output.xtc
+xtcfreq                        	25000
+run                            	50ns
