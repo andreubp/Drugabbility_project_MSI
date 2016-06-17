@@ -1,17 +1,10 @@
-
-# coding: utf-8
-
-# In[ ]:
-
 from htmd import *
+from natsort import natsorted
+from htmd.protocols.production_v1 import Production
+from htmd.protocols.equilibration_v1 import Equilibration
 
-# # Using docking to generate starting poses for simulations
-# 
-# Download the files for this tutorial from this [link](http://pub.htmd.org/nc983hu3brda/ethtryp.tar.gz)
-
-# ## Dock the protein with the ligand
-
-# In[ ]:
+#Using docking to generate starting poses for simulations
+## Dock the protein with the ligand
 
 prot = Molecule('ethtryp/trypsin.pdb')
 prot.center()
@@ -20,10 +13,7 @@ print(lig,prot)
 poses, scores = dock(prot, lig)
 
 
-# ### Visualize the docked poses
-
-# In[ ]:
-
+# Visualize the docked poses
 mol = Molecule()
 mol.append(prot)
 for i, p in enumerate(poses):
@@ -31,10 +21,7 @@ for i, p in enumerate(poses):
 #mol.view(sel='protein', style='NewCartoon', hold=True)
 #mol.view(sel='resname MOL', style='Licorice', color=1)
 
-
-# ## Build systems from docked poses
-
-# In[ ]:
+# Build systems from docked poses
 moltbuilt=[]
 for i, p in enumerate(poses):
     prot = Molecule('ethtryp/trypsin.pdb')
@@ -45,15 +32,15 @@ for i, p in enumerate(poses):
     prot.center()
     from htmd.molecule.util import maxDistance
     D = maxDistance(prot, 'all')
-    
+
     ligand = p
     ligand.set('segid','L')
     ligand.set('resname','MOL')
-    
+
     mol = Molecule(name='combo')
     mol.append(prot)
     mol.append(ligand)
-    
+
     D = D + 15
     smol = solvate(mol, minmax=[[-D, -D, -D], [D, D, D]])
     topos  = ['top/top_all22star_prot.rtf', 'top/top_water_ions.rtf', './ethtryp/ethanol.rtf']
@@ -63,13 +50,8 @@ for i, p in enumerate(poses):
     if i==4: # For time purposes lets only build the two first
         break
 
+# Equilibrate the build systems
 
-# ## Equilibrate the build systems
-
-# In[ ]:
-
-from htmd.protocols.equilibration_v1 import Equilibration
-from natsort import natsorted
 md = Equilibration()
 md.numsteps = 1000
 md.temperature = 298
@@ -81,15 +63,8 @@ mdx = AcemdLocal()
 mdx.submit(glob('./docked/equil/*/'))
 mdx.wait()
 
-
-# ## Create the production folder
-
+# Create the production folder
 #NEW PROD
-
-from htmd import *
-from natsort import natsorted
-from htmd.protocols.production_v1 import Production
- 
 md= Production()
 md.acemd.bincoordinates = 'output.coor' #here, only 'output.coor' is necessary
 md.acemd.extendedsystem  = 'output.xsc'
@@ -117,9 +92,8 @@ md.generatorspath='generators/*/'
 md.datapath='input/'
 #md.dryrun = True  # creates everything but does not submit anything
 md.metricsel1 = 'name CA'
-md.metricsel2 = '(resname BEN) and ((name C7) or (name C6))' 
+md.metricsel2 = '(resname BEN) and ((name C7) or (name C6))'
 md.metrictype = 'contacts'
 md.ticadim = 3 #metricticadmin?
 md.updateperiod = 14400 # execute every 4 hours
 md.run()
-
