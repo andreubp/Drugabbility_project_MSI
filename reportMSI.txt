@@ -1,0 +1,13 @@
+This project aims to provide a simple platform to search across a set of ligands which ones result in a system with a free energy lower than -2 kcal/mol. This would reflect a good interaction between the ligand and the protein, this is a very interesting property in a drug. Ideally, a low energy of interaction may correspond with a good drug candidate.
+
+We have used a small but diverse set of ligands: A negatively charged (glutamate), a posetively charged  (choline), an hydrophilic (ethanol) and a hydrophobic one (benzamidine). Trypsin was used as our target protein.
+
+This ligands need to be parameterice before any calculation in order to be in a conformation as close to reality as possible. This process is really computationally demanding and depends on the number of atoms of the molecule being parameterice.
+
+Main pipeline description:
+
+To start, this platform initialices the system by doing a docking between the ligand and the protein using the dock function of htmd. The top 5 poses are used to build the systems, each pose is built independently. The point of starting with docked position is that it ensures a good starting point to run a simulation and saves time and computer resources. Each of the five different poses are solvated and a salt concentration of 0.15 (UNITS?) is added, to simulate cell conditions (???).
+
+After this, an equilibration protocol is defined where a temperature of 298 Kelvin is used. The already equilibrate systems enter the production step were, finally, trajectories are created for each system. Finally, we run adaptive to generate the epochs which will finally be used to the ligand binding analysis.
+
+
