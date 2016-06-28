@@ -230,5 +230,3 @@ if __name__ == "__main__":
     Produce(run_time)
     sys.stderr.write('Finished producing. Starting the adaptive run, this could take days of running...')
     adaptive(minsim,maxsim,numbep,dimtica,sleeping)
-
-#    simulate(args.prot, args.ligand, args.rtf,args.params,nbuilds=1,run_time=10,minsim=1,maxsim=2,numbep=4,dimtica=3,sleeping=14400)
