@@ -4,6 +4,7 @@ from htmd.molecule.util import maxDistance
 from htmd.protocols.equilibration_v1 import Equilibration
 from htmd.protocols.production_v1 import Production
 from natsort import natsorted
+import sys
 import argparse
 
 parser = argparse.ArgumentParser(description="Druggability Project")
@@ -36,52 +37,45 @@ required=False,
 help='Params path')
 
 parser.add_argument('-c', '--config',
-dest='params',
+dest='config',
 action='store',
-default='parameters.config',
+default='./parameters.config',
 required=False,
 help='Parameters configuration file')
 
 args = parser.parse_args()
 
 def check_arguments():
-"""
-Check ifinputs are correctly given
-"""
-if not args.prot:
-    sys.stderr.write("Error: You forget to put the protein file path")
-    exit(1)
+    if not args.prot:
+        sys.stderr.write("Error: You forget to put the protein file path")
+        exit(1)
 
-if not args.ligand:
-    sys.stderr.write("Error: You forget to put the ligand file path.
-    Hit: remember to also include the -rtf and -prm argument ")
-    exit(1)
+    if not args.ligand:
+        sys.stderr.write("Error: You forget to put the ligand file path. Hit: remember to also include the -rtf and -prm argument ")
+        exit(1)
 
-if not args.rtf or args.prm:
-    sys.stderr.write("Error: You forget to include the rtf or prm file path")
-    exit(1)
+    if not args.rtf or not args.params:
+        sys.stderr.write("Error: You forget to include the rtf or prm file path")
+        exit(1)
 
 def parse_config (config_file):
-"""
-This method is used to read the configuration file to extract the necesary information for each part of the program
-"""
-op_config = open(config_file, "r")
-for line in op_config:
-    if line.startswith("nbuilds"):
-        nbuilds = line.split("\t")[1].strip()
-    if line.startswith("minsim"):
-        minsim = line.split("\t")[1].strip()
-    if line.startswith("maxsim"):
-        maxsim = line.split("\t")[1].strip()
-    if line.startswith("run_time"):
-        run_time = line.split("\t")[1].strip()
-    if line.startswith("numbep"):
-        numbep = line.split("\t")[1].strip()
-    if line.startswith("dimtica"):
-        dimtica = line.split("\t")[1].strip()
-    if line.startswith("sleeping"):
-        sleeping = line.split("\t")[1].strip()
-return(nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping)
+    op_config = open(config_file, "r")
+    for line in op_config:
+        if line.startswith("nbuilds"):
+            nbuilds = line.split("\t")[1].strip()
+        if line.startswith("minsim"):
+            minsim = line.split("\t")[1].strip()
+        if line.startswith("maxsim"):
+            maxsim = line.split("\t")[1].strip()
+        if line.startswith("run_time"):
+            run_time = line.split("\t")[1].strip()
+        if line.startswith("numbep"):
+            numbep = line.split("\t")[1].strip()
+        if line.startswith("dimtica"):
+            dimtica = line.split("\t")[1].strip()
+        if line.startswith("sleeping"):
+            sleeping = line.split("\t")[1].strip()
+    return(nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping)
 
 def simulate(pdbpath,ligandpath,path_ligand_rtf,path_ligand_prm,nbuilds=4,run_time=50,minsim=6,maxsim=8,numbep=12,dimtica=3,sleeping=14400):
     prot = Molecule(pdbpath) 
@@ -210,15 +204,14 @@ def analysis(boot=0.8,clusters=1000,merge=5):
     retlist=list()
     for sinks in goodmacros[thekey]:
         retlist.append(mols[sinks])
-    sys.stderr.write('These models contain the best interactions/poses: \n %s' %(retlist)
-
+    sys.stderr.write('These models contain the best interactions/poses:')
     kin.plotRates(rates=('g0eq'))
     kin.plotFluxPathways()
     return retlist
 
 if __name__ == "__main__":
     check_arguments()
-    (nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping) = parse_config(params)
+    (nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping) = parse_config(args.config)
     prot = Molecule(args.prot) 
     prot.filter('protein or water or resname CA')
     prot.set('segid', 'P', sel='protein and noh')
