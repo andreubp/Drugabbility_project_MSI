@@ -4,7 +4,9 @@ from htmd.molecule.util import maxDistance
 from htmd.protocols.equilibration_v1 import Equilibration
 from htmd.protocols.production_v1 import Production
 from natsort import natsorted
+
 import sys
+
 import argparse
 
 parser = argparse.ArgumentParser(description="Druggability Project")
@@ -230,5 +232,3 @@ if __name__ == "__main__":
     Produce(run_time)
     sys.stderr.write('Finished producing. Starting the adaptive run, this could take days of running...')
     adaptive(minsim,maxsim,numbep,dimtica,sleeping)
-
-#    simulate(args.prot, args.ligand, args.rtf,args.params,nbuilds=1,run_time=10,minsim=1,maxsim=2,numbep=4,dimtica=3,sleeping=14400)
