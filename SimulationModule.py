@@ -58,13 +58,16 @@ def check_arguments():
     if not args.prot:
         sys.stderr.write("Error: You forget to put the protein file path\n")
         exit(1)
-    if args.ligand and args.params and args.rtf:
-        if args.mol2:
-            sys.stderr.write("Error: You Introduce both options: mol2 and pdb,rtf,prm files. Choose only one option\n")
-            exit(1)
-        ligand_path = args.ligand
-        rtf_path = args.rtf
-        params_path = args.params
+    if args.ligand:
+        if args.params and args.rtf:
+            if args.mol2:
+                sys.stderr.write("Error: You Introduce both options: mol2 and pdb,rtf,prm files. Choose only one option\n")
+                exit(1)
+            ligand_path = args.ligand
+            rtf_path = args.rtf
+            params_path = args.params
+        else:
+            sys.stderr.write("Error: You introduce a ligand pdb file, but rtf and prm files are missing. Introduce them with -rtf and -prm input options \n")
     if not args.ligand or not args.params or not args.rtf:
         if not args.mol2:
             sys.stderr.write("You need to introduce one ligand input options: a mol2 file, or  pdb,rtf and prm files.\n")
