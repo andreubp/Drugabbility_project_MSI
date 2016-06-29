@@ -110,8 +110,9 @@ def parameter(mol2, netcharge):
     ligand_path = molec_name+".pdb"
     params_path = molec_name+".prm"
     rtf_path = molec_name+".rtf"
-    print(ligand_path,params_path,rtf_path)
-    return(ligand_path, params_path, rtf_path)
+    print('Parameters needed has been created on your working directory.\n Use: python3 SimulationModule.py -p trypsin.pdb --ligand '+ligand_path + '-rtf '+rtf_path +' -prm '+ params_path+'\n')
+    quit()
+    
 
 def dockinit(protein_path, ligand_path):
     prot = Molecule(protein_path) 
