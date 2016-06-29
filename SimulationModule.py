@@ -7,7 +7,6 @@ from natsort import natsorted
 import sys
 import argparse
 import random
-
 parser = argparse.ArgumentParser(description="Druggability Project")
 parser.add_argument('-l', '--ligand',
 dest='ligand',
@@ -110,7 +109,7 @@ def parameter(mol2, netcharge):
     ligand_path = molec_name+".pdb"
     params_path = molec_name+".prm"
     rtf_path = molec_name+".rtf"
-    print('Parameters needed has been created on your working directory.\n Use: python3 SimulationModule.py -p trypsin.pdb --ligand '+ligand_path + ' -rtf '+rtf_path +' -prm '+ params_path+'\n')
+    print('Parameters needed has been created on your working directory.\n Use: python3 SimulationModule.py -p trypsin.pdb --ligand '+ligand_path + '-rtf '+rtf_path +' -prm '+ params_path+'\n')
     quit()
     
 
@@ -138,7 +137,6 @@ def building(prot,poses,D,path_ligand_rtf,path_ligand_prm,nbuilds=4):
         mol.append(ligand)
 
         smol = solvate(mol, minmax=[[-D, -D, -D], [D, D, D]])
-        print(path_ligand_rtf,path_ligand_rpm)
         topos  = ['top/top_all22star_prot.rtf', 'top/top_water_ions.rtf',path_ligand_rtf] #'./ethtryp/ethanol.rtf'
         params = ['par/par_all22star_prot.prm', 'par/par_water_ions.prm', path_ligand_prm] #'./ethtryp/ethanol.prm'
 
