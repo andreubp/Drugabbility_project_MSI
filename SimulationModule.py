@@ -110,7 +110,7 @@ def parameter(mol2, netcharge):
     ligand_path = molec_name+".pdb"
     params_path = molec_name+".prm"
     rtf_path = molec_name+".rtf"
-    print('Parameters needed has been created on your working directory.\n Use: python3 SimulationModule.py -p trypsin.pdb --ligand '+ligand_path + '-rtf '+rtf_path +' -prm '+ params_path+'\n')
+    print('Parameters needed has been created on your working directory.\n Use: python3 SimulationModule.py -p trypsin.pdb --ligand '+ligand_path + ' -rtf '+rtf_path +' -prm '+ params_path+'\n')
     quit()
     
 
