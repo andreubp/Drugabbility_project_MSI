@@ -78,6 +78,9 @@ def parse_config (config_file):
     return(nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping)
 
 def simulate(pdbpath,ligandpath,path_ligand_rtf,path_ligand_prm,nbuilds=4,run_time=50,minsim=6,maxsim=8,numbep=12,dimtica=3,sleeping=14400):
+    if len(glob('./docked/'))!=0:
+        print('A folder called docked already exists, please change its name to avoid overwritting')
+        quit()
     prot = Molecule(pdbpath) 
     prot.filter('protein or water or resname CA')
     prot.set('segid', 'P', sel='protein and noh')
