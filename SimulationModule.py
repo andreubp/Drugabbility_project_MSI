@@ -106,13 +106,11 @@ def parameter(mol2, netcharge):
     config.JobName = molec_name.split("/")[-1]+str(random.randint(1,1000))
     config.NetCharge = netcharge
     param = Parameterization(config=config)
-    paramfiles = param.getParameters()
-    shutil.copyfile(paramfiles['RTF'], molec_name+".rtf")
-    shutil.copyfile(paramfiles['PRM'], molec_name+".prm")
-    shutil.copyfile(paramfiles['PDB'], molec_name+".pdb")
+    paramfiles = param.getParameters(outdir='./', outname=molec_name)
     ligand_path = molec_name+".pdb"
     params_path = molec_name+".prm"
     rtf_path = molec_name+".rtf"
+    print(ligand_path,params_path,rtf_path)
     return(ligand_path, params_path, rtf_path)
 
 def dockinit(protein_path, ligand_path):
