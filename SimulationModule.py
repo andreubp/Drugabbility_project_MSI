@@ -58,10 +58,20 @@ def check_arguments():
     if not args.prot:
         sys.stderr.write("Error: You forget to put the protein file path")
         exit(1)
-
-    if not args.ligand or not args.params or not args.:
-        sys.stderr.write("Error: You forget to put the ligand file path")
-        exit(1)
+    if args.ligand or args.params or args.rtf:
+        if args.mol2:
+            sys.stderr.write("Error: You Introduce both options: mol2 and pdb,rtf,prm files. Choose only one option")
+            exit(1)
+        ligand_path = args.ligand
+        rtf_path = args.rtf
+        params_path = args.params
+    if not args.ligand or not args.params or not args.rtf:
+        if not args.mol2:
+            sys.stderr.write("You need to introduce one ligand input options: a mol2 file, or  pdb,rtf and prm files.")
+            exit(1)
+        if args.mol2:
+            (ligand_path,rtf_path,params_path)=parameter(args.mol2, netcharge)
+            return(ligand_path,rtf_path,prm_path)
 
 def parse_config (config_file):
     op_config = open(config_file, "r")
@@ -85,28 +95,25 @@ def parse_config (config_file):
     return(nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping, netcharge)
 
 def parameter(mol2, netcharge):
-    if not args.rtf or not args.params:
-        molec = Molecule(mol2)
-        config = Configuration()
-        config.FileName = mol2
-	molec_name = (input_name(mol2)[0])
-        config.JobName = molec_name+random.randint(1,1000)
-        config.NetCharge = netcharge
-        param = Parameterisation(config=config)
-        paramfiles = param.getParameters()
-        shutil.copyfile(paramfiles['RTF'], molec_name+".rtf")
-        shutil.copyfile(paramfiles['PRM'], molec_name+".prm")
-        shutil.copyfile(paramfiles['PDB'], molec_name+".pdb")
-        pdb_path = molec_name+".pdb"
-        prm_path = molec_name+".prm"
-        rtf_path = molec_name+".rtf"
-        return(pdb_path, prm_path, rtf_path)
-"""	
-def simulate(pdbpath,ligandpath,path_ligand_rtf,path_ligand_prm,nbuilds=4,run_time=50,minsim=6,maxsim=8,numbep=12,dimtica=3,sleeping=14400):
-   if len(glob('./docked/'))!=0:
-        sys.stderr.write ('A folder called docked already exists, please change its name to avoid overwritting')
-        quit()
-    prot = Molecule(pdbpath) 
+    molec = Molecule(mol2)
+    config = Configuration()
+    config.FileName = mol2
+    molec_name = str(mol2)
+    molec_name = molec_name.split(".")[0]
+    config.JobName = molec_name.split("/")[-1]+str(random.randint(1,1000))
+    config.NetCharge = netcharge
+    param = Parameterisation(config=config)
+    paramfiles = param.getParameters()
+    shutil.copyfile(paramfiles['RTF'], molec_name+".rtf")
+    shutil.copyfile(paramfiles['PRM'], molec_name+".prm")
+    shutil.copyfile(paramfiles['PDB'], molec_name+".pdb")
+    ligand_path = molec_name+".pdb"
+    params_path = molec_name+".prm"
+    rtf_path = molec_name+".rtf"
+    return(ligand_path, params_path, rtf_path)
+
+def dockinit(protein_path, ligand_path):
+    prot = Molecule(protein_path) 
     prot.filter('protein or water or resname CA')
     prot.set('segid', 'P', sel='protein and noh')
     prot.set('segid', 'W', sel='water')
@@ -114,17 +121,9 @@ def simulate(pdbpath,ligandpath,path_ligand_rtf,path_ligand_prm,nbuilds=4,run_ti
     D = maxDistance(prot, 'all')
     D = D + 15
     prot.center()
-    lig = Molecule(ligandpath)
+    lig = Molecule(ligand_path)
     poses, scores = dock(prot, lig)
-    sys.stderr.write('\nDocking finished.')
-    building(prot,poses,D,path_ligand_rtf,path_ligand_prm,nbuilds)
-    sys.stderr.write('\nAll systems build.')
-    Equilibrate()
-    sys.stderr.write('All systems equilibrated.Entering production, this could take days of running...')
-    Produce(run_time)
-    sys.stderr.write('Finished producing. Starting the adaptive run, this could take days of running...')
-    adaptive(minsim,maxsim,numbep,dimtica,sleeping)
-"""
+    return (prot, poses)
 
 def building(prot,poses,D,path_ligand_rtf,path_ligand_prm,nbuilds=4):
     moltbuilt=[]
@@ -143,7 +142,6 @@ def building(prot,poses,D,path_ligand_rtf,path_ligand_prm,nbuilds=4):
         moltbuilt.append(charmm.build(smol, topo=topos, param=params, outdir='./docked/build/{}/'.format(i+1), saltconc=0.15))
         if i==nbuilds:
             break
-
 
 def Equilibrate():
     md = Equilibration()
@@ -239,21 +237,11 @@ if __name__ == "__main__":
     if len(glob('./docked/'))!=0:
         sys.stderr.write ('A folder called docked already exists, please change its name to avoid overwritting')
         quit()
-    check_arguments()
     (nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping, netcharge) = parse_config(args.config)
-    (prot, rtf, prm) = 
-    prot = Molecule(args.prot) 
-    prot.filter('protein or water or resname CA')
-    prot.set('segid', 'P', sel='protein and noh')
-    prot.set('segid', 'W', sel='water')
-    prot.set('segid', 'CA', sel='resname CA')
-    D = maxDistance(prot, 'all')
-    D = D + 15
-    prot.center()
-    lig = Molecule(args.ligand)
-    poses, scores = dock(prot, lig)
+    (ligand_path,rtf_path,prm_path) =check_arguments()
+    (prot, poses) = dockinit(args.prot, ligand_path)
     sys.stderr.write('\nDocking finished.')
-    building(prot,poses,D,args.rtf,args.params,nbuilds)
+    building(prot,poses,D,rtf_path,params_path,nbuilds)
     sys.stderr.write('\nAll systems build.')
     Equilibrate()
     sys.stderr.write('All systems equilibrated.Entering production, this could take days of running...')
