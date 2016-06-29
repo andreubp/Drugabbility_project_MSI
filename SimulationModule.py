@@ -137,6 +137,7 @@ def building(prot,poses,D,path_ligand_rtf,path_ligand_prm,nbuilds=4):
         mol.append(ligand)
 
         smol = solvate(mol, minmax=[[-D, -D, -D], [D, D, D]])
+        print(path_ligand_rtf,path_ligand_rpm)
         topos  = ['top/top_all22star_prot.rtf', 'top/top_water_ions.rtf',path_ligand_rtf] #'./ethtryp/ethanol.rtf'
         params = ['par/par_all22star_prot.prm', 'par/par_water_ions.prm', path_ligand_prm] #'./ethtryp/ethanol.prm'
 
@@ -189,50 +190,6 @@ def adaptive(minsim=6,maxsim=8,numbep=12,dimtica=3,sleeping=14400):
     md.ticadim = dimtica
     md.updateperiod = sleeping
     md.run()
-
-def analysis(boot=0.8,clusters=1000,merge=5):
-    sims = simlist(glob('./filtered/*/'), './filtered/filtered.pdb')
-    metr = Metric(sims)
-    metr.projection(MetricDistance('protein and name CA', 'resname MOL and noh', metric='contacts'))
-    data = metr.project()
-    data.fstep = 0.1
-    data.plotTrajSizes()
-    data.dropTraj()
-    tica = TICA(data, 10)
-    dataTica = tica.project(3)
-    dataBoot = dataTica.bootstrap(0.8)
-    dataBoot.cluster(MiniBatchKMeans(n_clusters=1000), mergesmall=5) #try with dataTica instead of dataBoot
-    model = Model(dataBoot) #try with dataTica
-    model.plotTimescales() 
-
-    nframes=input('At which time do time scales converge?')
-    ntimescales=input('How many different time scales do you see?')
-    model.markovModel(int(nframes)*10, int(ntimescales)) 
-    mols = model.getStates()
-
-    kin = Kinetics(model, temperature=298, concentration=0.0037)
-    goodmacros=dict()
-    mols = model.getStates()
-    for i in range(len(mols)):
-        for j in range(len(mols)):
-            r = kin.getRates(i,j)
-            if r.g0eq < -2:
-                try:
-                    goodmacros[i].append(j)
-                except:
-                    goodmacros[i]=[j]
-    
-    curr_max_len=0
-    for keys in goodmacros:
-        if len(goodmacros[keys])>curr_max_len:
-            curr_max_len=len(goodmacros[keys])
-            thekey=keys
-
-    retlist=list()
-    for sinks in goodmacros[thekey]:
-        retlist.append(mols[sinks])
-    kin.plotRates(rates=('g0eq'))
-    kin.plotFluxPathways()
 
 if __name__ == "__main__":
     if len(glob('./docked/'))!=0:
