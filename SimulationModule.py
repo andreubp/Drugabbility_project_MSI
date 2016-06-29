@@ -3,7 +3,7 @@ from htmd import *
 from htmd.molecule.util import maxDistance
 from htmd.protocols.equilibration_v1 import Equilibration
 from htmd.protocols.production_v1 import Production
-from htmd.parameterize import Configuration, Parameterisation
+#from htmd.parameterize import Configuration, Parameterisation
 from natsort import natsorted
 import sys
 import argparse
@@ -56,22 +56,22 @@ args = parser.parse_args()
 
 def check_arguments():
     if not args.prot:
-        sys.stderr.write("Error: You forget to put the protein file path")
+        sys.stderr.write("Error: You forget to put the protein file path\n")
         exit(1)
-    if args.ligand or args.params or args.rtf:
+    if args.ligand and args.params and args.rtf:
         if args.mol2:
-            sys.stderr.write("Error: You Introduce both options: mol2 and pdb,rtf,prm files. Choose only one option")
+            sys.stderr.write("Error: You Introduce both options: mol2 and pdb,rtf,prm files. Choose only one option\n")
             exit(1)
         ligand_path = args.ligand
         rtf_path = args.rtf
         params_path = args.params
     if not args.ligand or not args.params or not args.rtf:
         if not args.mol2:
-            sys.stderr.write("You need to introduce one ligand input options: a mol2 file, or  pdb,rtf and prm files.")
+            sys.stderr.write("You need to introduce one ligand input options: a mol2 file, or  pdb,rtf and prm files.\n")
             exit(1)
         if args.mol2:
             (ligand_path,rtf_path,params_path)=parameter(args.mol2, netcharge)
-            return(ligand_path,rtf_path,prm_path)
+    return(ligand_path,rtf_path,params_path)
 
 def parse_config (config_file):
     op_config = open(config_file, "r")
@@ -90,7 +90,7 @@ def parse_config (config_file):
             dimtica = line.split("\t")[1].strip()
         if line.startswith("sleeping"):
             sleeping = line.split("\t")[1].strip()
-	if line.startswith("NetCharge"):
+        if line.startswith("netcharge"):
             netcharge = line.split("\t")[1].strip() 
             print(netcharge)
     return(nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping, netcharge)
@@ -124,7 +124,7 @@ def dockinit(protein_path, ligand_path):
     prot.center()
     lig = Molecule(ligand_path)
     poses, scores = dock(prot, lig)
-    return (prot, poses)
+    return (prot, poses, D)
 
 def building(prot,poses,D,path_ligand_rtf,path_ligand_prm,nbuilds=4):
     moltbuilt=[]
@@ -236,16 +236,16 @@ def analysis(boot=0.8,clusters=1000,merge=5):
 
 if __name__ == "__main__":
     if len(glob('./docked/'))!=0:
-        sys.stderr.write ('A folder called docked already exists, please change its name to avoid overwritting')
+        sys.stderr.write ('A folder called docked already exists, please change its name to avoid overwritting \n')
         quit()
     (nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping, netcharge) = parse_config(args.config)
-    (ligand_path,rtf_path,prm_path) =check_arguments()
-    (prot, poses) = dockinit(args.prot, ligand_path)
-    sys.stderr.write('\nDocking finished.')
+    (ligand_path,rtf_path,params_path)=check_arguments()
+    (prot, poses, D) = dockinit(args.prot, ligand_path)
+    sys.stderr.write('\nDocking finished.\n')
     building(prot,poses,D,rtf_path,params_path,nbuilds)
-    sys.stderr.write('\nAll systems build.')
+    sys.stderr.write('\nAll systems build.\n')
     Equilibrate()
-    sys.stderr.write('All systems equilibrated.Entering production, this could take days of running...')
+    sys.stderr.write('\nAll systems equilibrated.Entering production, this could take days of running...\n')
     Produce(run_time)
-    sys.stderr.write('Finished producing. Starting the adaptive run, this could take days of running...')
+    sys.stderr.write('\nFinished producing. Starting the adaptive run, this could take days of running...\n')
     adaptive(minsim,maxsim,numbep,dimtica,sleeping)
