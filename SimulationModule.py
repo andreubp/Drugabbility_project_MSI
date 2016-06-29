@@ -92,6 +92,7 @@ def parse_config (config_file):
             sleeping = line.split("\t")[1].strip()
 	if line.startswith("NetCharge"):
             netcharge = line.split("\t")[1].strip() 
+            print(netcharge)
     return(nbuilds, run_time, minsim, maxsim, numbep, dimtica, sleeping, netcharge)
 
 def parameter(mol2, netcharge):
